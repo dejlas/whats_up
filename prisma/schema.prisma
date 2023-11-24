@@ -1,0 +1,58 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "sqlite"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id String @id @default(cuid())
+
+    phoneNumber String
+    firstName   String
+    lastName    String
+    password    String
+
+    createdAt      DateTime         @default(now())
+    updatedAt      DateTime         @updatedAt
+    ChatRoomMember ChatRoomMember[]
+}
+
+model ChatRoom {
+    id String @id @default(cuid())
+
+    createdAt      DateTime         @default(now())
+    updatedAt      DateTime         @updatedAt
+    ChatRoomMember ChatRoomMember[]
+    Message        Message[]
+}
+
+model ChatRoomMember {
+    id String @id @default(cuid())
+
+    userId     String
+    chatRoomId String
+
+    user     User     @relation(fields: [userId], references: [id])
+    chatRoom ChatRoom @relation(fields: [chatRoomId], references: [id])
+
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+    Message   Message[]
+}
+
+model Message {
+    id String @id @default(cuid())
+
+    chatRoomMemberId String
+    chatRoomId       String
+
+    chatRoomMember ChatRoomMember @relation(fields: [chatRoomMemberId], references: [id])
+    chatRoom       ChatRoom       @relation(fields: [chatRoomId], references: [id])
+
+    message String
+
+    createdAt DateTime @default(now())
+}
